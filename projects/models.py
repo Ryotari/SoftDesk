@@ -31,6 +31,9 @@ class Contributor(models.Model):
                             choices=ROLES,
                             default='CONTRIBUTOR')
 
+    class Meta:
+        unique_together = ('user', 'project')
+        
 class Issue(models.Model):
     TAGS = [
         ('BUG', 'BUG'),
@@ -55,9 +58,13 @@ class Issue(models.Model):
     tag = models.CharField(choices=TAGS, max_length=7)
     priority = models.CharField(choices=PRIORITIES, max_length=6, default='LOW')
     status = models.CharField(choices=STATUSES, max_length=11, default='TODO')
-    project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
-    author = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    assignee = models.ForeignKey(to=Contributor, on_delete=models.CASCADE)
+    project = models.ForeignKey(to=Project, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(to=settings.AUTH_USER_MODEL,
+                            on_delete=models.CASCADE,
+                            related_name='issue_author')
+    assignee = models.ForeignKey(to=settings.AUTH_USER_MODEL,
+                            on_delete=models.CASCADE,
+                            related_name='issue_assignee')
     created_time = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):

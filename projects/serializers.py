@@ -1,8 +1,57 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from projects.models import (Project,
                             Contributor,
                             Issue,
                             Comment)
+
+class CommentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comment
+        fields = ['id',
+                'description',
+                'author',
+                'issue'
+                ]
+
+class UserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']
+
+class IssueListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Issue
+        fields = ['id',
+                'title',
+                'desc',
+                'tag',
+                'status',
+                'project',
+                'priority',
+                'author',
+                'assignee',
+                ]
+        #read_only_fields = ('project',)
+
+class IssueDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Issue
+        fields = ['id',
+                'created_time',
+                'title',
+                'desc',
+                'tag',
+                'status',
+                'project',
+                'priority',
+                'author',
+                'assignee',
+        ]
 
 class ContributorSerializer(serializers.ModelSerializer):
 
@@ -19,7 +68,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
                 'type',
                 'description',
                 'author']
-        read_only_fields = ('author', 'id')
+        #read_only_fields = ('author', 'id')
 
 class ProjectDetailSerializer(serializers.ModelSerializer):
     

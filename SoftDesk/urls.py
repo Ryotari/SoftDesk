@@ -16,15 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from users.views import SignupView
-from rest_framework import routers
+from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from projects.views import ProjectViewset, ContributorViewset
+from projects.views import ProjectViewset, ContributorViewset, IssueViewset, CommentViewset
 
-router = routers.SimpleRouter('project')
+router = routers.SimpleRouter()
+router.register(r'projects/?', ProjectViewset, basename='projects')
 
-router.register('project', ProjectViewset, basename='project')
-router.register('project/<int:project_id>/users', ContributorViewset, basename='contributor')
+users_router = routers.NestedSimpleRouter(router, r'projects/?', lookup='projects')
+users_router.register(r'users/?', ContributorViewset, basename='users')
 
+issues_router = routers.NestedSimpleRouter(router, r'projects/?', lookup='projects')
+issues_router.register(r'issues/?', IssueViewset, basename='issues')
+
+comments_router = routers.NestedSimpleRouter(issues_router, r'issues/?', lookup='issues')
+comments_router.register(r'comments/?', CommentViewset, basename='comments')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
@@ -32,4 +38,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('signup/', SignupView.as_view(), name='signup'),
     path('api/', include(router.urls)),
+    path('api/', include(users_router.urls)),
+    path('api/', include(issues_router.urls)),
+    path('api/', include(comments_router.urls))
 ]

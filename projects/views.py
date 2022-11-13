@@ -44,6 +44,12 @@ class ProjectViewset(ModelViewSet):
         contributor.save()
         return Response(project.data)
 
+    def update(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data['author'] = request.user.id
+        request.data._mutable = False
+        return super().update(request, *args, kwargs)
+        
 class ContributorViewset(ModelViewSet):
     serializer_class = UserSerializer
     detail_serializer_class = UserSerializer
